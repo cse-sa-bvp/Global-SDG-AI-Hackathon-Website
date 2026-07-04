@@ -1,0 +1,8 @@
+export function generateTeamCode(): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = 'BVHACK-';
+  for (let i = 0; i < 5; i++) {
+    code += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return code;
+}
