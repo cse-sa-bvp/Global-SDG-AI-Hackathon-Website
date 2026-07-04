@@ -23,7 +23,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { generateTeamCode } from '@/lib/utils/team';
-import { CheckCircle, Clock, XCircle, Copy, Share, UserCheck, UserX } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, Copy, Share, UserCheck, UserX, CreditCard } from 'lucide-react';
+import { RegistrationDialog } from '@/components/payment/RegistrationDialog';
 import type { User, Team, JoinRequest } from '@/types';
 
 export default function TeamPage() {
@@ -49,7 +50,10 @@ export default function TeamPage() {
 
   useEffect(() => {
     if (action === 'register' && teamData && userData?.uid === teamData.leaderId) {
-      setShowRegistrationDialog(true);
+      // Only show dialog if payment is still pending
+      if (teamData.paymentStatus !== 'paid' && teamData.registrationStatus !== 'registered') {
+        setShowRegistrationDialog(true);
+      }
     }
   }, [action, teamData, userData]);
 
@@ -66,7 +70,13 @@ export default function TeamPage() {
           // User has a team
           const teamDoc = await getDoc(doc(db, 'teams', data.teamId));
           if (teamDoc.exists()) {
-            const team = { teamId: teamDoc.id, ...teamDoc.data() } as Team;
+            const teamDocData = teamDoc.data();
+            const team = { 
+              teamId: teamDoc.id, 
+              ...teamDocData,
+              paidAt: teamDocData.paidAt?.toDate?.() || teamDocData.paidAt,
+              createdAt: teamDocData.createdAt?.toDate?.() || teamDocData.createdAt,
+            } as Team;
             setTeamData(team);
 
             // Fetch team members
@@ -281,23 +291,10 @@ export default function TeamPage() {
     }
   };
 
-  const startRegistration = async () => {
-    if (!teamData || !user) return;
-
-    setActionLoading(true);
-    try {
-      await updateDoc(doc(db, 'teams', teamData.teamId), {
-        registrationStatus: 'pending_payment'
-      });
-
-      toast.success('Registration initiated! Pending payment...');
-      setShowRegistrationDialog(false);
-      fetchData();
-    } catch (error) {
-      toast.error('Failed to start registration');
-    } finally {
-      setActionLoading(false);
-    }
+  const handleRegistrationSuccess = () => {
+    setShowRegistrationDialog(false);
+    fetchData();
+    router.push('/dashboard/team');
   };
 
   if (loading) {
@@ -333,11 +330,46 @@ export default function TeamPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {isLeader && teamData.registrationStatus === 'incomplete' && teamMembers.length > 0 && (
-              <div className="mb-4">
-                <Button onClick={() => setShowRegistrationDialog(true)}>
-                  Register Team
-                </Button>
+            {isLeader && (
+              <>
+                {teamData.paymentStatus === 'pending' && teamData.registrationStatus === 'incomplete' && teamMembers.length > 0 && (
+                  <Button onClick={() => setShowRegistrationDialog(true)} size="lg">
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Register Team (₹199)
+                  </Button>
+                )}
+                {teamData.paymentStatus === 'paid' && teamData.registrationStatus === 'registered' && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-green-700 mb-2">
+                      <CheckCircle className="h-5 w-5" />
+                      <h3 className="font-semibold">Registration Completed!</h3>
+                    </div>
+                    <div className="space-y-1 text-sm text-green-600">
+                      <p><strong>Payment ID:</strong> {teamData.paymentId}</p>
+                      <p><strong>Status:</strong> Paid</p>
+                      {teamData.paidAt && (
+                        <p><strong>Paid on:</strong> {new Date(teamData.paidAt).toLocaleDateString()}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {teamData.paymentStatus === 'failed' && (
+                  <div className="space-y-2">
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+                      <XCircle className="h-5 w-5 inline mr-2" />
+                      Payment failed. Please try again.
+                    </div>
+                    <Button onClick={() => setShowRegistrationDialog(true)} variant="outline">
+                      Retry Payment
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+            {!isLeader && teamData.registrationStatus === 'registered' && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
+                <CheckCircle className="h-5 w-5 inline mr-2" />
+                Your team is registered for the hackathon!
               </div>
             )}
           </CardContent>
@@ -410,38 +442,14 @@ export default function TeamPage() {
         )}
 
         {/* Registration Dialog */}
-        {showRegistrationDialog && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <Card className="w-full max-w-md">
-              <CardHeader>
-                <CardTitle>Register Team</CardTitle>
-                <CardDescription>Confirm your team registration</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p><strong>Team Name:</strong> {teamData.teamName}</p>
-                  <p><strong>Members:</strong> {teamMembers.length}/4</p>
-                  <p><strong>Registration Fee:</strong> ₹199</p>
-                </div>
-                <div className="flex gap-3">
-                  <Button 
-                    onClick={startRegistration} 
-                    disabled={actionLoading}
-                    className="flex-1"
-                  >
-                    Proceed
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowRegistrationDialog(false)}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        {showRegistrationDialog && userData && (
+          <RegistrationDialog
+            team={teamData}
+            teamMembers={teamMembers}
+            currentUser={userData}
+            onClose={() => setShowRegistrationDialog(false)}
+            onSuccess={handleRegistrationSuccess}
+          />
         )}
       </div>
     );

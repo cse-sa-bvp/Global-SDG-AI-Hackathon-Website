@@ -6,13 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { 
   collection, 
-  getDocs, 
   addDoc, 
   deleteDoc, 
   doc, 
   updateDoc,
   orderBy,
   query,
+  onSnapshot,
   serverTimestamp 
 } from '@/lib/firebase/firestore';
 import { db } from '@/lib/firebase/firestore';
@@ -40,28 +40,31 @@ export default function AdminAnnouncementsPage() {
     resolver: zodResolver(announcementSchema),
   });
 
+  // Real-time listener for announcements
   useEffect(() => {
-    fetchAnnouncements();
-  }, []);
+    const announcementsQuery = query(
+      collection(db, 'announcements'),
+      orderBy('createdAt', 'desc')
+    );
 
-  const fetchAnnouncements = async () => {
-    try {
-      const announcementsQuery = query(
-        collection(db, 'announcements'),
-        orderBy('createdAt', 'desc')
-      );
-      const announcementsSnapshot = await getDocs(announcementsQuery);
-      const announcementsList = announcementsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Announcement[];
+    const unsubscribe = onSnapshot(announcementsQuery, (snapshot) => {
+      const announcementsList = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate?.() || data.createdAt,
+        } as Announcement;
+      });
       setAnnouncements(announcementsList);
-    } catch (error) {
-      console.error('Error fetching announcements:', error);
-    } finally {
       setLoading(false);
-    }
-  };
+    }, (error) => {
+      console.error('Error fetching announcements:', error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const onSubmit = async (data: AnnouncementForm) => {
     setSubmitting(true);
@@ -75,7 +78,6 @@ export default function AdminAnnouncementsPage() {
 
       toast.success('Announcement created successfully!');
       reset();
-      fetchAnnouncements();
     } catch (error) {
       toast.error('Failed to create announcement');
     } finally {
@@ -89,7 +91,6 @@ export default function AdminAnnouncementsPage() {
     try {
       await deleteDoc(doc(db, 'announcements', id));
       toast.success('Announcement deleted');
-      fetchAnnouncements();
     } catch (error) {
       toast.error('Failed to delete announcement');
     }
@@ -101,7 +102,6 @@ export default function AdminAnnouncementsPage() {
         visible: !currentVisibility,
       });
       toast.success('Visibility updated');
-      fetchAnnouncements();
     } catch (error) {
       toast.error('Failed to update visibility');
     }
@@ -135,7 +135,7 @@ export default function AdminAnnouncementsPage() {
               <textarea
                 id="description"
                 {...register('description')}
-                className="w-full min-h-[100px] rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm"
+                className="w-full min-h-25 rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm"
               />
               {errors.description && (
                 <p className="text-sm text-red-500">{errors.description.message}</p>

@@ -23,8 +23,11 @@ export interface Team {
   teamCode: string;
   leaderId: string;
   members: string[];
-  paymentStatus: 'pending' | 'completed';
+  paymentStatus: 'pending' | 'paid' | 'failed';
   registrationStatus: 'incomplete' | 'pending_payment' | 'registered';
+  paymentId?: string;
+  orderId?: string;
+  paidAt?: Date;
   createdAt: Date;
 }
 
@@ -65,18 +68,25 @@ export interface ProblemStatement {
 export interface Submission {
   id: string;
   teamId: string;
+  teamCode: string;
   projectName: string;
   description: string;
   github: string;
   pptUrl: string;
+  pptFileName: string;
   submittedAt: Date;
 }
 
 export interface Payment {
+  id?: string;
   paymentId: string;
+  orderId: string;
   teamId: string;
+  leaderId: string;
   amount: number;
-  status: 'pending' | 'completed' | 'failed';
-  transactionId?: string;
+  currency: string;
+  status: 'pending' | 'paid' | 'failed';
+  paymentMethod?: string;
+  paidAt?: Date;
   createdAt: Date;
 }

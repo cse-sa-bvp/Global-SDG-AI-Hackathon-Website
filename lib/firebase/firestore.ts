@@ -14,7 +14,8 @@ import {
   orderBy,
   limit,
   Timestamp,
-  arrayUnion
+  arrayUnion,
+  onSnapshot
 } from 'firebase/firestore';
 import { app } from '@/firebase/firebaseConfig';
 
@@ -36,5 +37,6 @@ export {
   orderBy, 
   limit,
   Timestamp,
-  arrayUnion
+  arrayUnion,
+  onSnapshot
 };

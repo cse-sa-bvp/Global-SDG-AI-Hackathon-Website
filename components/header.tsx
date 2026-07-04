@@ -20,49 +20,9 @@ export const HeroHeader = () => {
             return
         }
 
-        try {
-            // Get user data to check team status
-            const userDoc = await getDoc(doc(db, 'users', user.uid))
-            if (!userDoc.exists()) {
-                router.push('/auth/complete-profile')
-                return
-            }
-
-            const userData = userDoc.data() as User
-            
-            if (!userData.teamId) {
-                // User not in team, redirect to team page
-                router.push('/dashboard/team')
-                return
-            }
-
-            // User has team, check registration status
-            const teamDoc = await getDoc(doc(db, 'teams', userData.teamId))
-            if (!teamDoc.exists()) {
-                router.push('/dashboard/team')
-                return
-            }
-
-            const teamData = teamDoc.data() as Team
-            
-            // Check if user is team leader
-            if (teamData.leaderId !== user.uid) {
-                router.push('/dashboard')
-                return
-            }
-
-            // Team leader with incomplete registration - redirect to register
-            if (teamData.registrationStatus === 'incomplete') {
-                router.push('/dashboard/team?action=register')
-                return
-            }
-
-            // Already registered or pending payment
-            router.push('/dashboard')
-        } catch (error) {
-            console.error('Error checking registration status:', error)
-            router.push('/dashboard')
-        }
+        // Always redirect logged-in users to team page with action=register
+        // The team page will handle the logic based on their status
+        router.push('/dashboard/team?action=register')
     }
 
     return (

@@ -60,7 +60,7 @@ export default function DashboardPage() {
   }
 
   const registrationStatus = teamData?.registrationStatus === 'registered';
-  const paymentStatus = teamData?.paymentStatus === 'completed';
+  const paymentStatus = teamData?.paymentStatus === 'paid';
   const registrationPending = teamData?.registrationStatus === 'pending_payment';
 
   return (

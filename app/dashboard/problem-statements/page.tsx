@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query, where, orderBy } from '@/lib/firebase/firestore';
+import { collection, onSnapshot } from '@/lib/firebase/firestore';
 import { db } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,29 +17,34 @@ export default function ProblemStatementsPage() {
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [loading, setLoading] = useState(true);
 
+  // Real-time listener for problem statements
   useEffect(() => {
-    const fetchProblemStatements = async () => {
-      try {
-        const problemStatementsQuery = query(
-          collection(db, 'problemStatements'),
-          where('isActive', '==', true),
-          orderBy('createdAt', 'desc')
-        );
-        const problemStatementsSnapshot = await getDocs(problemStatementsQuery);
-        const problemStatementsList = problemStatementsSnapshot.docs.map(doc => ({
+    const unsubscribe = onSnapshot(collection(db, 'problemStatements'), (snapshot) => {
+      const problemStatementsList = snapshot.docs
+        .map(doc => {
+        const data = doc.data();
+        return {
           id: doc.id,
-          ...doc.data()
-        })) as ProblemStatement[];
-        setProblemStatements(problemStatementsList);
-        setFilteredStatements(problemStatementsList);
-      } catch (error) {
-        console.error('Error fetching problem statements:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+          ...data,
+          createdAt: data.createdAt?.toDate?.() || data.createdAt,
+          updatedAt: data.updatedAt?.toDate?.() || data.updatedAt,
+        } as ProblemStatement;
+        })
+        .filter((problemStatement) => problemStatement.isActive !== false)
+        .sort((a, b) => {
+          const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return bTime - aTime;
+        });
+      setProblemStatements(problemStatementsList);
+      setFilteredStatements(problemStatementsList);
+      setLoading(false);
+    }, (error) => {
+      console.error('Error fetching problem statements:', error);
+      setLoading(false);
+    });
 
-    fetchProblemStatements();
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {

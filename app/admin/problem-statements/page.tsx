@@ -6,13 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { 
   collection, 
-  getDocs, 
   addDoc, 
   deleteDoc, 
   doc, 
   updateDoc,
   orderBy,
   query,
+  onSnapshot,
   serverTimestamp 
 } from '@/lib/firebase/firestore';
 import { db } from '@/lib/firebase/firestore';
@@ -58,28 +58,32 @@ export default function ProblemStatementsPage() {
     resolver: zodResolver(problemStatementSchema),
   });
 
+  // Real-time listener for problem statements
   useEffect(() => {
-    fetchProblemStatements();
-  }, []);
+    const problemStatementsQuery = query(
+      collection(db, 'problemStatements'),
+      orderBy('createdAt', 'desc')
+    );
 
-  const fetchProblemStatements = async () => {
-    try {
-      const problemStatementsQuery = query(
-        collection(db, 'problemStatements'),
-        orderBy('createdAt', 'desc')
-      );
-      const problemStatementsSnapshot = await getDocs(problemStatementsQuery);
-      const problemStatementsList = problemStatementsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as ProblemStatement[];
+    const unsubscribe = onSnapshot(problemStatementsQuery, (snapshot) => {
+      const problemStatementsList = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate?.() || data.createdAt,
+          updatedAt: data.updatedAt?.toDate?.() || data.updatedAt,
+        } as ProblemStatement;
+      });
       setProblemStatements(problemStatementsList);
-    } catch (error) {
-      console.error('Error fetching problem statements:', error);
-    } finally {
       setLoading(false);
-    }
-  };
+    }, (error) => {
+      console.error('Error fetching problem statements:', error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const onSubmit = async (data: ProblemStatementForm) => {
     setSubmitting(true);
@@ -110,7 +114,6 @@ export default function ProblemStatementsPage() {
 
       reset();
       setShowForm(false);
-      fetchProblemStatements();
     } catch (error) {
       toast.error('Failed to save problem statement');
     } finally {
@@ -124,7 +127,6 @@ export default function ProblemStatementsPage() {
     try {
       await deleteDoc(doc(db, 'problemStatements', id));
       toast.success('Problem statement deleted');
-      fetchProblemStatements();
     } catch (error) {
       toast.error('Failed to delete problem statement');
     }
@@ -137,7 +139,6 @@ export default function ProblemStatementsPage() {
         updatedAt: serverTimestamp(),
       });
       toast.success('Visibility updated');
-      fetchProblemStatements();
     } catch (error) {
       toast.error('Failed to update visibility');
     }

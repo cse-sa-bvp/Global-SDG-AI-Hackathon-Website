@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, query, where, orderBy, getDocs } from '@/lib/firebase/firestore';
+import { collection, onSnapshot } from '@/lib/firebase/firestore';
 import { db } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Announcement } from '@/types';
@@ -10,28 +10,32 @@ export default function AnnouncementsPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Real-time listener for announcements
   useEffect(() => {
-    const fetchAnnouncements = async () => {
-      try {
-        const announcementsQuery = query(
-          collection(db, 'announcements'),
-          where('visible', '==', true),
-          orderBy('createdAt', 'desc')
-        );
-        const announcementsSnapshot = await getDocs(announcementsQuery);
-        const announcementsList = announcementsSnapshot.docs.map(doc => ({
+    const unsubscribe = onSnapshot(collection(db, 'announcements'), (snapshot) => {
+      const announcementsList = snapshot.docs
+        .map(doc => {
+        const data = doc.data();
+        return {
           id: doc.id,
-          ...doc.data()
-        })) as Announcement[];
-        setAnnouncements(announcementsList);
-      } catch (error) {
-        console.error('Error fetching announcements:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+          ...data,
+          createdAt: data.createdAt?.toDate?.() || data.createdAt,
+        } as Announcement;
+        })
+        .filter((announcement) => announcement.visible !== false)
+        .sort((a, b) => {
+          const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return bTime - aTime;
+        });
+      setAnnouncements(announcementsList);
+      setLoading(false);
+    }, (error) => {
+      console.error('Error fetching announcements:', error);
+      setLoading(false);
+    });
 
-    fetchAnnouncements();
+    return () => unsubscribe();
   }, []);
 
   if (loading) {
