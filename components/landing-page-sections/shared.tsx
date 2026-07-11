@@ -240,7 +240,7 @@ export function SectionIntro({
           ) : null}
         </h2>
       ) : null}
-      {subtitle ? <p className={cn("mt-4 max-w-2xl text-pretty text-base leading-7 text-neutral-600 sm:text-lg", centered && "mx-auto")}>{subtitle}</p> : null}
+      {subtitle ? <p className={cn("mt-4 max-w-4xl text-pretty text-base leading-7 text-neutral-600 sm:text-lg", centered && "mx-auto")}>{subtitle}</p> : null}
     </div>
   );
 }

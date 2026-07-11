@@ -9,11 +9,11 @@ import { cn } from "@/lib/utils";
 import { SectionIntro, SectionShell, benefits } from "./shared";
 
 const cardVisuals = [
-  { image: "/Card1.png", icon: Trophy, ring: "ring-sky-100", iconColor: "text-sky-600", underline: "bg-sky-500", textWidth: "max-w-[58%] sm:max-w-[54%]" },
-  { image: "/Card2.png", icon: Users, ring: "ring-violet-100", iconColor: "text-violet-600", underline: "bg-violet-500", textWidth: "max-w-[58%] sm:max-w-[54%]" },
-  { image: "/Card3.png", icon: Code2, ring: "ring-emerald-100", iconColor: "text-emerald-600", underline: "bg-emerald-500", textWidth: "max-w-[58%] sm:max-w-[54%]" },
-  { image: "/Card4.png", icon: Globe, ring: "ring-emerald-100", iconColor: "text-emerald-600", underline: "bg-emerald-500", textWidth: "max-w-[46%] sm:max-w-[42%]" },
-  { image: "/Card5.png", icon: Share2, ring: "ring-indigo-100", iconColor: "text-indigo-600", underline: "bg-indigo-500", textWidth: "max-w-[46%] sm:max-w-[42%]" },
+  { image: "/Card1.png", icon: Trophy, ring: "ring-sky-100", iconColor: "text-sky-600", underline: "bg-sky-500", textWidth: "max-w-[70%] sm:max-w-[66%]" },
+  { image: "/Card2.png", icon: Users, ring: "ring-violet-100", iconColor: "text-violet-600", underline: "bg-violet-500", textWidth: "max-w-[70%] sm:max-w-[66%]" },
+  { image: "/Card3.png", icon: Code2, ring: "ring-emerald-100", iconColor: "text-emerald-600", underline: "bg-emerald-500", textWidth: "max-w-[70%] sm:max-w-[66%]" },
+  { image: "/Card4.png", icon: Globe, ring: "ring-emerald-100", iconColor: "text-emerald-600", underline: "bg-emerald-500", textWidth: "max-w-[48%] sm:max-w-[44%]" },
+  { image: "/Card5.png", icon: Share2, ring: "ring-indigo-100", iconColor: "text-indigo-600", underline: "bg-indigo-500", textWidth: "max-w-[48%] sm:max-w-[44%]" },
   { image: "/Card6.png", icon: ShieldCheck, ring: "ring-violet-100", iconColor: "text-violet-600", underline: "bg-violet-500", textWidth: "" },
 ] as const;
 
@@ -26,7 +26,7 @@ export default function WhyParticipateSection() {
         eyebrow="Why Participate"
         title="Built for"
         highlight="ambitious teams"
-        subtitle="A concise bento grid that keeps the value proposition sharp."
+        subtitle="From global recognition to real AI solutions — here's what you'll walk away with."
         centered
       />
 
@@ -43,7 +43,11 @@ export default function WhyParticipateSection() {
                 key={benefit.title}
                 className={cn(
                   "group relative overflow-hidden rounded-[1.75rem] border border-neutral-200 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_20px_48px_rgba(15,23,42,0.1)]",
-                  isFullWidth ? "h-[180px] sm:h-[200px]" : isTopRow ? "h-[210px] sm:h-[230px]" : "h-[260px] sm:h-[280px]",
+                  isFullWidth
+                    ? "h-auto min-h-[220px] sm:h-[200px] sm:min-h-0"
+                    : isTopRow
+                    ? "h-auto min-h-[240px] sm:h-[230px] sm:min-h-0"
+                    : "h-auto min-h-[280px] sm:h-[280px] sm:min-h-0",
                   isFullWidth ? "bg-[#fbfbfa]" : undefined,
                   benefit.span
                 )}
@@ -64,7 +68,7 @@ export default function WhyParticipateSection() {
                       />
                     </div>
 
-                    <div className="relative z-10 flex h-full max-w-[58%] flex-col justify-center p-6 sm:max-w-[52%] sm:p-8">
+                    <div className="relative z-10 flex h-full max-w-[66%] flex-col justify-center p-6 sm:max-w-[60%] sm:p-8">
                       <div
                         className={cn(
                           "inline-flex size-14 items-center justify-center rounded-2xl bg-white shadow-[0_6px_16px_rgba(15,23,42,0.08)] ring-1",
@@ -79,7 +83,7 @@ export default function WhyParticipateSection() {
                       </h3>
                       <span className={cn("mt-2 block h-[3px] w-8 rounded-full", visual.underline)} />
 
-                      <p className=" text-sm leading-7 text-neutral-600 ">
+                      <p className="mt-2 text-sm leading-5 text-neutral-600">
                         {benefit.description}
                       </p>
                     </div>
@@ -113,7 +117,7 @@ export default function WhyParticipateSection() {
                       </h3>
                       <span className={cn("mt-2 block h-[3px] w-8 rounded-full", visual.underline)} />
 
-                      <p className=" text-sm leading-7 text-neutral-800" style={textShadow}>
+                      <p className="mt-2 text-sm leading-5 text-neutral-800" style={textShadow}>
                         {benefit.description}
                       </p>
                     </div>
