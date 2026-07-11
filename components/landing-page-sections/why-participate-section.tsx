@@ -117,7 +117,7 @@ export default function WhyParticipateSection() {
                       </h3>
                       <span className={cn("mt-2 block h-[3px] w-8 rounded-full", visual.underline)} />
 
-                      <p className="mt-2 text-sm leading-5 text-neutral-800" style={textShadow}>
+                      <p className="mt-2 text-sm leading-5 text-neutral-600" style={textShadow}>
                         {benefit.description}
                       </p>
                     </div>
