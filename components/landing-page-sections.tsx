@@ -10,21 +10,26 @@ import SponsorsSection from "@/components/landing-page-sections/sponsors-section
 import FaqSection from "@/components/landing-page-sections/faq-section";
 import FinalCtaSection from "@/components/landing-page-sections/final-cta-section";
 import ContactSection from "@/components/landing-page-sections/contact-section";
-
+import TrustedBySection from "./landing-page-sections/trusted-by";
+import PartnerWithUs from "./landing-page-sections/partner-with-us";
 export default function LandingPageSections() {
   return (
     <>
-      <OrganizedBySection />
+      <CountdownSection />
+      <TrustedBySection />
+      
       <WhyHackathonSection />
+      <WhyParticipateSection />
       <TracksSection />
       <JourneySection />
-      <WhyParticipateSection />
-      <CountdownSection />
+      
+      
       <PrizePoolSection />
-      <AboutBvSection />
-      <SponsorsSection />
+      
+     
       <FaqSection />
       <FinalCtaSection />
+      <PartnerWithUs />
       <ContactSection />
     </>
   );

@@ -6,6 +6,13 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Allura } from "next/font/google";
 import { ArrowRight, ExternalLink } from "lucide-react";
+// Add Poppins to the existing Allura import line
+import { Poppins } from "next/font/google";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
 
 import { cn } from "@/lib/utils";
 
@@ -31,8 +38,8 @@ const ACCENT_STYLES: Record<Accent, { badge: string; icon: string; glow: string 
 export const tracks = [
   {
     title: "Healthcare",
-    description: "Build AI that improves access, triage, and care outcomes.",
-    challenge: "Early screening, workflow support, and patient-first innovation.",
+    description: "Build AI that improves healthcare delivery and patient outcomes.",
+    challenge: "Diagnosis • Accessibility • Clinical workflows",
     href: "/tracks",
     image: "/healthcare.jpg",
     icon: HeartPulseIcon,
@@ -40,8 +47,8 @@ export const tracks = [
   },
   {
     title: "Education",
-    description: "Create learning tools that adapt to every student.",
-    challenge: "Personalization, accessibility, and teacher augmentation.",
+    description: "Create inclusive learning experiences powered by intelligent technology.",
+    challenge: "Personalized learning • Accessibility • Assessment",
     href: "/tracks",
     image: "/education.jpeg",
     icon: GraduationCapIcon,
@@ -49,8 +56,8 @@ export const tracks = [
   },
   {
     title: "Climate Action",
-    description: "Turn environmental data into decisions that reduce impact.",
-    challenge: "Monitoring, prediction, and action at community scale.",
+    description: "Develop solutions that help communities understand and reduce climate impact.",
+    challenge: "Carbon tracking • Forecasting • Sustainability",
     href: "/tracks",
     image: "/climate.jpg",
     icon: LeafIcon,
@@ -58,8 +65,8 @@ export const tracks = [
   },
   {
     title: "Agriculture",
-    description: "Support farmers with intelligent, practical field tools.",
-    challenge: "Yield support, resource planning, and resilient supply chains.",
+    description: "Empower farmers through smarter, data-driven agricultural solutions.",
+    challenge: "Precision farming • Crop health • Resource efficiency",
     href: "/tracks",
     image: "/agriculture.jpg",
     icon: FactoryIcon,
@@ -67,40 +74,40 @@ export const tracks = [
   },
   {
     title: "Smart Cities",
-    description: "Design city experiences that feel simpler and more responsive.",
-    challenge: "Mobility, public services, and urban system intelligence.",
+    description: "Design intelligent systems for safer and more connected cities.",
+    challenge: "Mobility • Infrastructure • Public services",
     href: "/tracks",
     image: "/smartcity.png",
     icon: Building2Icon,
     accent: "indigo" as Accent,
   },
   {
-    title: "Water",
-    description: "Use AI to protect, monitor, and distribute water wisely.",
-    challenge: "Leak detection, quality insights, and conservation tools.",
-    href: "/tracks",
-    image: "/water.webp",
-    icon: DropletsIcon,
-    accent: "cyan" as Accent,
-  },
-  {
     title: "Clean Energy",
-    description: "Make energy systems more efficient and more predictable.",
-    challenge: "Forecasting, optimization, and demand balancing.",
+    description: "Accelerate the transition toward cleaner and more efficient energy.",
+    challenge: "Renewables • Smart grids • Energy optimization",
     href: "/tracks",
     image: "/energy.webp",
     icon: SunMediumIcon,
     accent: "amber" as Accent,
   },
   {
-    title: "Industry & Innovation",
-    description: "Build products that help teams ship, learn, and scale faster.",
-    challenge: "Automation, productivity, and next-generation workflows.",
-    href: "/tracks",
-    image: "/industry.png",
-    icon: CpuIcon,
-    accent: "fuchsia" as Accent,
-  },
+  title: "Digital Inclusion",
+  description: "Empower communities through accessible, inclusive, and equitable AI-driven technology.",
+  challenge: "Accessibility • Digital Literacy • Inclusive Technology",
+  href: "/tracks",
+  image: "/dig.jpg",
+  icon: ShieldCheckIcon,
+  accent: "cyan" as Accent,
+},
+{
+  title: "Responsible AI",
+  description: "Build ethical, transparent, and trustworthy AI systems for a better future.",
+  challenge: "AI Ethics • Fairness • Transparency",
+  href: "/tracks",
+  image: "/res.jpeg",
+  icon: ShieldCheckIcon,
+  accent: "violet" as Accent,
+},
 ] as const;
 
 export const journeySteps = [
@@ -114,12 +121,12 @@ export const journeySteps = [
 ] as const;
 
 export const benefits = [
-  { title: "Win Exciting Prizes", description: "Recognition designed for standout ideas and polished execution.", icon: AwardIcon, span: "md:col-span-2" },
-  { title: "Industry Mentorship", description: "Build faster with feedback from people who ship real products.", icon: UsersIcon, span: "md:col-span-2" },
-  { title: "Build Real AI Solutions", description: "Focus on quality prototypes with practical value.", icon: BrainIcon, span: "md:col-span-2" },
-  { title: "Solve SDG Challenges", description: "Work on themes that connect technology to meaningful outcomes.", icon: Globe2Icon, span: "md:col-span-3" },
-  { title: "Networking", description: "Meet peers, mentors, and builders who care about impact.", icon: HandshakeIcon, span: "md:col-span-3" },
-  { title: "Participation Certificates", description: "Every team gets recognition for showing up and building.", icon: BadgeCheckIcon, span: "md:col-span-6" },
+  { title: "Recognition That Matters", description: "Showcase your ideas on a global stage.", icon: AwardIcon, span: "md:col-span-2" },
+  { title: "Learn from Experts", description: "Learn directly from industry and academic mentors.", icon: UsersIcon, span: "md:col-span-2" },
+  { title: "Build Real AI Solutions", description: "Turn innovative ideas into working AI solutions.", icon: BrainIcon, span: "md:col-span-2" },
+  { title: "Solve Challenges That Matter", description: "Work on problem statements inspired by the United Nations Sustainable Development Goals.", icon: Globe2Icon, span: "md:col-span-3" },
+  { title: "Connect Beyond Your Campus", description: "Connect with innovators, founders, developers, researchers, and changemakers from diverse backgrounds.", icon: HandshakeIcon, span: "md:col-span-3" },
+  { title: "A Portfolio That Opens Doors", description: "Leave with more than just memories—gain a verified certificate, a standout AI project, valuable teamwork experience, and practical skills you can confidently showcase in internships, placements, hackathons, and startup journeys.", icon: BadgeCheckIcon, span: "md:col-span-6" },
 ] as const;
 
 export const prizeCards = [
@@ -157,6 +164,7 @@ export const supportingLogos = [
   { src: "/placeholder-logo.svg", alt: "IET Placeholder", label: "IET" },
 ] as const;
 
+// SectionShell — add style prop to the motion.section
 export function SectionShell({
   id,
   className,
@@ -170,6 +178,7 @@ export function SectionShell({
     <motion.section
       id={id}
       className={cn("scroll-mt-24 py-20 sm:py-24 lg:py-28", className)}
+      style={{ fontFamily: poppins.style.fontFamily }}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
@@ -307,19 +316,19 @@ export function TrackCard({ title, description, challenge, href, image, icon: Ic
             </div>
           </div>
 
-          <div className="mt-auto">
-            <h3 className="text-lg font-semibold tracking-tight text-neutral-950">{title}</h3>
-            <p className="mt-2 text-sm leading-6 text-neutral-600">{description}</p>
+          <div className="mt-auto pt-3">
+  <h3 className="text-lg font-semibold tracking-tight text-neutral-950">{title}</h3>
+  <p className="mt-2 text-sm leading-6 text-neutral-600">{description}</p>
 
-            <div className="pt-5">
-              <p className="max-h-0 overflow-hidden text-sm leading-6 text-neutral-600 opacity-0 transition-all duration-300 group-hover:max-h-20 group-hover:opacity-100">
-                {challenge}
-              </p>
-              <div className={cn("mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-neutral-500 transition-all duration-300 group-hover:gap-3", styles.icon)}>
-                Explore track <ArrowRight className="size-3.5" />
-              </div>
-            </div>
-          </div>
+  <div className="pt-2">
+    <p className="max-h-0 overflow-hidden text-sm leading-6 text-neutral-600 opacity-0 transition-all duration-300 group-hover:max-h-20 group-hover:opacity-100">
+      {challenge}
+    </p>
+    <div className={cn("mt-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-neutral-500 transition-all duration-300 group-hover:gap-3", styles.icon)}>
+      Explore track <ArrowRight className="size-3.5" />
+    </div>
+  </div>
+</div>
         </div>
       </motion.article>
     </Link>

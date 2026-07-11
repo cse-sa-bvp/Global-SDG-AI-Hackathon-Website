@@ -11,7 +11,7 @@ const allura = Allura({
 
 export default function TimelineSection() {
   return (
-    <section className={`${allura.variable} relative overflow-hidden bg-[#FFFFFF] py-20 px-6`}>
+    <section id="timeline" className={`${allura.variable} relative overflow-hidden bg-[#FAFAF7] py-20 px-6`}>
       {/* subtle decorative dot grids in the corners, like the reference */}
       <div
         className="pointer-events-none absolute left-6 top-10 h-28 w-28 opacity-40"
@@ -38,19 +38,21 @@ export default function TimelineSection() {
 
         {/* Heading */}
         <h2 className="flex flex-wrap items-baseline justify-center gap-x-4 text-4xl font-extrabold text-[#12142B] sm:text-5xl">
-          <span>Your</span>
+          <span>Every Innovation Has a </span>
+          
+          {/* <span
+            className="bg-[#0c8f63]  bg-clip-text text-transparent pb-1"
+            style={{ fontFamily: "var(--font-allura)", fontSize: "1.7em", fontWeight: 600 }}
+          >
+            
+            
+          </span> */}
+          
           <span
-            className="bg-gradient-to-r from-[#3B82F6] to-[#10B981] bg-clip-text text-transparent"
-            style={{ fontFamily: "var(--font-allura)", fontSize: "1.7em", fontWeight: 400 }}
+            className="bg-gradient-to-r  from-[#3a81f3] to-[#11c88b] via-[#4ab4f5] bg-clip-text text-transparent pb-1.5"
+            style={{ fontFamily: "var(--font-allura)", fontSize: "1.7em", fontWeight: 600 }}
           >
             Journey.
-          </span>
-          <span>Six Stages to</span>
-          <span
-            className="text-[#6D28D9]"
-            style={{ fontFamily: "var(--font-allura)", fontSize: "1.7em", fontWeight: 400 }}
-          >
-            Impact.
           </span>
         </h2>
 
@@ -66,8 +68,7 @@ export default function TimelineSection() {
 
         {/* Subtitle */}
         <p className="mx-auto max-w-xl text-base text-[#5B5F72] sm:text-lg">
-          From idea to impact — follow the path of innovation and make a
-          difference with AI.
+          Every great solution begins with an idea. Here's how yours evolves into real-world impact.
         </p>
 
         {/* Roadmap graphic (pre-made image, used as-is) */}

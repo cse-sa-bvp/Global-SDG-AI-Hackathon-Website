@@ -58,7 +58,24 @@ export default function Lanyard({
                 camera={{position, fov}}
                 dpr={[1, isMobile ? 1.5 : 2]}
                 gl={{alpha: transparent, preserveDrawingBuffer: true}}
-                onCreated={({gl}) => gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)}
+                onCreated={({gl}) => {
+                    gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1);
+
+                    // Guard against WebGL context loss (e.g. from GPU memory
+                    // pressure). Without preventDefault() on 'webglcontextlost',
+                    // the browser treats the context as permanently dead and the
+                    // canvas goes blank with no chance to recover.
+                    const canvasEl = gl.domElement;
+                    const handleContextLost = (event: Event) => {
+                        event.preventDefault();
+                        console.warn('Lanyard: WebGL context lost — attempting recovery.');
+                    };
+                    const handleContextRestored = () => {
+                        console.info('Lanyard: WebGL context restored.');
+                    };
+                    canvasEl.addEventListener('webglcontextlost', handleContextLost, false);
+                    canvasEl.addEventListener('webglcontextrestored', handleContextRestored, false);
+                }}
             >
                 <ambientLight intensity={Math.PI}/>
                 <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60}>
@@ -130,29 +147,56 @@ function Band({maxSpeed = 50, minSpeed = 0, isMobile = false, cardTextureUrl}: B
 
     const {nodes, materials} = useGLTF(cardGLB) as any;
     const texture = useTexture(typeof lanyard === 'string' ? lanyard : lanyard.src) as THREE.Texture;
-    
-    // Load custom card texture if provided - use state to handle async loading
+
+    // Load custom card texture if provided - use state to handle async loading.
+    // IMPORTANT: dispose of the PREVIOUS texture via the functional setState form,
+    // not via a captured closure variable — the old version disposed a stale
+    // reference (or nothing), leaking a GPU texture every time a new card texture
+    // was generated. Enough leaked textures forces the browser to reclaim GPU
+    // memory by killing the WebGL context outright ("THREE.WebGLRenderer: Context
+    // Lost"), which is why the card would eventually go blank.
     const [customCardTexture, setCustomCardTexture] = useState<THREE.Texture | null>(null);
-    
+
     useEffect(() => {
+        let cancelled = false;
+
         if (!cardTextureUrl) {
-            setCustomCardTexture(null);
+            setCustomCardTexture((prev) => {
+                prev?.dispose();
+                return null;
+            });
             return;
         }
-        
+
         const loader = new THREE.TextureLoader();
         loader.load(cardTextureUrl, (loadedTexture) => {
+            if (cancelled) {
+                // A newer texture request superseded this one before it finished
+                // loading — discard it immediately instead of leaking it.
+                loadedTexture.dispose();
+                return;
+            }
             loadedTexture.flipY = false;
             loadedTexture.colorSpace = THREE.SRGBColorSpace;
-            setCustomCardTexture(loadedTexture);
+            setCustomCardTexture((prev) => {
+                prev?.dispose();
+                return loadedTexture;
+            });
         });
-        
+
         return () => {
-            if (customCardTexture) {
-                customCardTexture.dispose();
-            }
+            cancelled = true;
         };
     }, [cardTextureUrl]);
+
+    // Final cleanup of whatever texture is currently held, on unmount only.
+    useEffect(() => {
+        return () => {
+            customCardTexture?.dispose();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const [curve] = useState(
         () =>
             new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])

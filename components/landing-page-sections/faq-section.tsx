@@ -100,10 +100,10 @@ const FAQDemo = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div id="faqs" className="min-h-screen">
       <FAQ 
-        title="Frequently Asked Questions"
-        subtitle="Let's answer some questions"
+        title="Got Questions?"
+        subtitle="Frequently Asked Questions"
         categories={categories}
         faqData={faqData}
       />

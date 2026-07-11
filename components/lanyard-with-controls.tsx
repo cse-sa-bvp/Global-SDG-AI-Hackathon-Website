@@ -48,6 +48,13 @@ interface LanyardWithControlsProps {
   containerClassName?: string;
   defaultName?: string;
   defaultVariant?: CardVariant;
+  // Classes for the wrapper around the "Personalize your card" panel below
+  // the 3D canvas. Exposed as a prop (instead of a hardcoded "mt-4") so each
+  // page can pull the controls up/down independently — e.g. a taller canvas
+  // has a lot of transparent empty space below the card itself, so a flat
+  // "mt-4" leaves a big dead gap (or, if the section is height-constrained,
+  // pushes the controls off-screen entirely).
+  controlsClassName?: string;
 }
 
 export default function LanyardWithControls({
@@ -55,38 +62,37 @@ export default function LanyardWithControls({
   containerClassName,
   defaultName = "",
   defaultVariant = "dark",
+  controlsClassName = "mt-4 px-6 pb-8",
 }: LanyardWithControlsProps) {
   const [inputValue, setInputValue] = useState(defaultName);
   const [appliedName, setAppliedName] = useState(defaultName);
   const [cardVariant, setCardVariant] = useState<CardVariant>(defaultVariant);
   const [appliedVariant, setAppliedVariant] = useState<CardVariant>(defaultVariant);
   const [cardTextureUrl, setCardTextureUrl] = useState<string | undefined>(undefined);
-  const [textureKey, setTextureKey] = useState(0);
   const [copied, setCopied] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const cardTemplateRef = useRef<CardTemplateRef>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
-  // Auto-capture texture when component mounts with a defaultName from URL
+
   useEffect(() => {
-    // If no defaultName, mark as initialized immediately
-    if (!defaultName) {
-      setIsInitialized(true);
-      return;
-    }
-    
-    // If there's a defaultName, wait for card template to render then capture
+    let cancelled = false;
+
     const timer = setTimeout(async () => {
       if (cardTemplateRef.current) {
         await cardTemplateRef.current.captureTexture();
       }
-      setIsInitialized(true);
+      if (!cancelled) {
+        setIsInitialized(true);
+      }
     }, 150);
-    
-    return () => clearTimeout(timer);
-  }, [defaultName]);
 
-  // Generate shareable URL with encrypted username and variant
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const getShareableUrl = useCallback(() => {
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
     if (appliedName) {
@@ -96,7 +102,6 @@ export default function LanyardWithControls({
     return `${baseUrl}/lanyard`;
   }, [appliedName, appliedVariant]);
 
-  // Share message templates
   const shareMessage = appliedName
     ? `I'll be at the Global SDG-AI Hackathon 2026 in Pune! Check out my personalized attendee card`
     : `Check out the Global SDG-AI Hackathon 2026! Create your personalized attendee card`;
@@ -124,7 +129,6 @@ export default function LanyardWithControls({
     }
   }, [getShareableUrl]);
 
-
   const characterCount = inputValue.length;
   const isAtLimit = characterCount >= MAX_CHARACTERS;
   const isNearLimit = characterCount >= MAX_CHARACTERS - 5;
@@ -132,7 +136,7 @@ export default function LanyardWithControls({
 
   const handleTextureReady = useCallback((dataUrl: string) => {
     setCardTextureUrl(dataUrl);
-    setTextureKey((prev) => prev + 1);
+    setIsInitialized(true);
   }, []);
 
   const handleExport = () => {
@@ -142,7 +146,6 @@ export default function LanyardWithControls({
   const handleApplyName = async () => {
     setAppliedName(inputValue);
     setAppliedVariant(cardVariant);
-    // Capture the card template as a texture
     await cardTemplateRef.current?.captureTexture();
   };
 
@@ -159,7 +162,6 @@ export default function LanyardWithControls({
     }
   };
 
-  // Show loading spinner while waiting for initialization
   if (!isInitialized) {
     return (
       <div className="flex flex-col">
@@ -186,17 +188,14 @@ export default function LanyardWithControls({
         userName={inputValue}
         variant={cardVariant}
         onTextureReady={handleTextureReady}
-        city='pune'
-        date='25–27.09.2026'
       />
       <Lanyard
-        key={textureKey}
         position={position}
         containerClassName={containerClassName}
         cardTextureUrl={cardTextureUrl}
         canvasRef={canvasRef}
       />
-      <div className="mt-4 px-6 pb-8">
+      <div className={controlsClassName}>
         <div className="mx-auto max-w-md lg:mx-0 lg:ml-auto">
           <div className="mb-4 flex items-center justify-between">
             <label className="text-sm font-medium text-muted-foreground p-1 bg-background">
@@ -302,8 +301,7 @@ export default function LanyardWithControls({
               Character limit reached
             </p>
           )}
-          
-          {/* Share buttons - only visible when a name has been applied */}
+
           {appliedName && (
             <div className="mt-4 flex items-center gap-2">
               <span className="text-sm font-medium text-muted-foreground p-1 bg-background">

@@ -43,7 +43,7 @@ function Check() {
 
 export default function OrganizedBySection() {
   return (
-    <SectionShell id="organizers" className="relative overflow-hidden border-t border-neutral-200/70 bg-white">
+    <SectionShell id="organizers" className="relative overflow-hidden border-t border-neutral-200/70 bg-[#FAFAF7]">
       {/* Decorative background wash, consistent with hero */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_10%,rgba(34,211,238,0.10),transparent_28%),radial-gradient(circle_at_85%_15%,rgba(124,58,237,0.08),transparent_26%),radial-gradient(circle_at_50%_100%,rgba(16,185,129,0.08),transparent_28%)]" />
 

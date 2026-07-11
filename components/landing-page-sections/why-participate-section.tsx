@@ -21,7 +21,7 @@ const textShadow = { textShadow: "0 1px 3px rgba(255,255,255,0.9), 0 1px 12px rg
 
 export default function WhyParticipateSection() {
   return (
-    <SectionShell id="benefits" className="bg-white">
+    <SectionShell id="benefits" className="bg-[#FAFAF7]">
       <SectionIntro
         eyebrow="Why Participate"
         title="Built for"
@@ -30,7 +30,7 @@ export default function WhyParticipateSection() {
         centered
       />
 
-      <div className="mt-10 -mx-6 sm:-mx-10 lg:-mx-20 xl:-mx-28">
+      <div className="mt-10 -mx-2 sm:-mx-4 lg:-mx-8 xl:-mx-10">
         <div className="grid gap-4 px-2 sm:px-4 md:grid-cols-6">
           {benefits.map((benefit, index) => {
             const visual = cardVisuals[index % cardVisuals.length];
@@ -43,7 +43,7 @@ export default function WhyParticipateSection() {
                 key={benefit.title}
                 className={cn(
                   "group relative overflow-hidden rounded-[1.75rem] border border-neutral-200 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_20px_48px_rgba(15,23,42,0.1)]",
-                  isFullWidth ? "h-[220px] sm:h-[240px]" : isTopRow ? "h-[250px] sm:h-[270px]" : "h-[300px] sm:h-[320px]",
+                  isFullWidth ? "h-[180px] sm:h-[200px]" : isTopRow ? "h-[210px] sm:h-[230px]" : "h-[260px] sm:h-[280px]",
                   isFullWidth ? "bg-[#fbfbfa]" : undefined,
                   benefit.span
                 )}
@@ -79,7 +79,7 @@ export default function WhyParticipateSection() {
                       </h3>
                       <span className={cn("mt-2 block h-[3px] w-8 rounded-full", visual.underline)} />
 
-                      <p className="mt-3 text-base leading-7 text-neutral-600">
+                      <p className=" text-sm leading-7 text-neutral-600 ">
                         {benefit.description}
                       </p>
                     </div>
@@ -113,7 +113,7 @@ export default function WhyParticipateSection() {
                       </h3>
                       <span className={cn("mt-2 block h-[3px] w-8 rounded-full", visual.underline)} />
 
-                      <p className="mt-3 text-base leading-7 text-neutral-800" style={textShadow}>
+                      <p className=" text-sm leading-7 text-neutral-800" style={textShadow}>
                         {benefit.description}
                       </p>
                     </div>
